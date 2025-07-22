@@ -8,7 +8,7 @@ from flask import Flask, request
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-TOKEN = os.environ.get("TOKEN", "7705145588:AAH3nZbWg8s_0HDA26xVYkjJ3o0oleYkDGA")
+TOKEN = os.environ.get("TOKEN", "7705145588:AAFzEufeVc45IpEiekpfxlkSe9gm_gS6dbA")
 PORT = int(os.environ.get("PORT", 8443))
 
 app = Flask(__name__)
