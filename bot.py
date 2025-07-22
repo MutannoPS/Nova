@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     async def main():
         await telegram_app.initialize()
-        await telegram_app.bot.set_webhook(f"https://https://rota-2zrg.onrender.com/{TOKEN}")
+        await telegram_app.bot.set_webhook(f"https://rota-2zrg.onrender.com/{TOKEN}")
         await telegram_app.start()
         app.run(host="0.0.0.0", port=PORT)
 
