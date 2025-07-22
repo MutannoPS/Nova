@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: bot-telegram-planilha
+    env: python
+    region: oregon  # ou 'frankfurt', se quiser na Europa
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: TOKEN
+        value: ${TOKEN}
