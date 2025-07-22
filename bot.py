@@ -2,11 +2,18 @@ import pandas as pd
 import requests
 import re
 import io
+import os
 from datetime import datetime
+from flask import Flask, request
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-TOKEN = "8095673432:AAGa19vnVQDqxLDz_OSr0wFPQUzH2mh03sA"
+TOKEN = os.environ.get("TOKEN", "8095673432:AAGa19vnVQDqxLDz_OSr0wFPQUzH2mh03sA")
+PORT = int(os.environ.get("PORT", 8443))
+
+app = Flask(__name__)
+telegram_app = ApplicationBuilder().token(TOKEN).build()
+
 
 def consultar_logradouro(cep):
     cep = str(cep).replace("-", "").strip()
@@ -42,14 +49,10 @@ def formatar_sequence(lista):
     return texto
 
 async def tratar_arquivo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Saudação personalizada
     hora = datetime.now().hour
-    if 5 <= hora < 12:
-        saudacao = "Bom dia ☀️"
-    elif 12 <= hora < 18:
-        saudacao = "Boa tarde 🌤️"
-    else:
-        saudacao = "Boa noite 🌙"
+    saudacao = (
+        "Bom dia ☀️" if hora < 12 else "Boa tarde 🌤️" if hora < 18 else "Boa noite 🌙"
+    )
 
     await update.message.reply_text(
         f"{saudacao}\n\n📥 Estou Aprimorando Sua Planilha, obrigado por aguardar. ⏳🚚"
@@ -97,8 +100,30 @@ async def tratar_arquivo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     buffer.seek(0)
 
     await update.message.reply_document(document=buffer, filename=nome_final)
-    await update.message.reply_text("✅ Sua Planilha Foi Atualizada Com Sucesso! Tenha uma ótimo Rota! 🎉")
+    await update.message.reply_text("✅ Sua Planilha Foi Atualizada Com Sucesso! Tenha uma ótima rota! 🎉")
 
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(MessageHandler(filters.Document.ALL, tratar_arquivo))
-app.run_polling()
+telegram_app.add_handler(MessageHandler(filters.Document.ALL, tratar_arquivo))
+
+
+@app.route(f"/{TOKEN}", methods=["POST"])
+def webhook():
+    update = Update.de_json(request.get_json(force=True), telegram_app.bot)
+    telegram_app.update_queue.put_nowait(update)
+    return "OK"
+
+
+@app.route("/")
+def home():
+    return "Bot online com webhook!", 200
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    async def main():
+        await telegram_app.initialize()
+        await telegram_app.bot.set_webhook(f"https://SEU_DOMINIO.render.com/{TOKEN}")
+        await telegram_app.start()
+        app.run(host="0.0.0.0", port=PORT)
+
+    asyncio.run(main())
