@@ -6,7 +6,7 @@ from datetime import datetime
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-TOKEN = "8095673432:AAGa19vnVQDqxLDz_OSr0wFPQUzH2mh03sA"
+TOKEN = "7705145588:AAH3nZbWg8s_0HDA26xVYkjJ3o0oleYkDGA"
 
 def consultar_logradouro(cep):
     cep = str(cep).replace("-", "").strip()
